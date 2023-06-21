@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package server;
+
+option go_package = "iam/internal/rpc/protoc";
+
+
+message Request {
+  string message = 1;
+}
+
+message Response {
+  string message = 1;
+}
+
+
+
+
+service User {
+  rpc Ping (Request) returns (Response) {}
+}
