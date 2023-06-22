@@ -29,7 +29,6 @@ func (s *server) Instance() *grpc.Server {
 }
 
 func (s *server) Serve() {
-
 	// Reflection fo automation generate url
 	reflection.Register(s.instance)
 
@@ -38,11 +37,15 @@ func (s *server) Serve() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	if err := s.instance.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	go func() {
+		if err := s.instance.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
+
+	fmt.Printf("GRPC Server Listen In %v:%v\n", s.host, s.port)
 }
 
 func (s *server) Terminal() {
-
+	fmt.Println("GRPC Server Stopped")
 }
