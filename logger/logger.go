@@ -1,17 +1,23 @@
 package logger
 
-import (
-	"github.com/sirupsen/logrus"
-)
+import "fmt"
 
 type ILogger interface {
+	Info()
+	Infof()
+	Debug()
+	Debugf()
+	Warn()
+	Warnf()
+	Error()
+	Errorf()
 }
 
 type logger struct {
-	log *logrus.Logger
+	//log *logrus.Logger
 }
 
-func NewInstance() (*logger, error) {
+func NewInstance() (ILogger, error) {
 	//log = logrus.New()
 	//formatter := new(logrus.TextFormatter)
 	//formatter.TimestampFormat = "2006-01-02 15:04:05"
@@ -71,9 +77,30 @@ func NewInstance() (*logger, error) {
 	//}
 	//log.SetLevel(level)
 
-	return nil, nil
+	return &logger{}, nil
 }
 
 func (l *logger) Info() {
-
+	fmt.Println("info")
+}
+func (l *logger) Infof() {
+	fmt.Println("infof")
+}
+func (l *logger) Debug() {
+	fmt.Println("debug")
+}
+func (l *logger) Debugf() {
+	fmt.Println("debugf")
+}
+func (l *logger) Warn() {
+	fmt.Println("warn")
+}
+func (l *logger) Warnf() {
+	fmt.Println("warnf")
+}
+func (l *logger) Error() {
+	fmt.Println("error")
+}
+func (l *logger) Errorf() {
+	fmt.Println("errorf")
 }

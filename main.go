@@ -5,13 +5,28 @@ import (
 	grpcHandler "gobase/internal/user/handler/grpc"
 	"gobase/internal/user/handler/grpc/protoc"
 	restHandler "gobase/internal/user/handler/rest"
+	"gobase/logger"
 	restServer "gobase/rest"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 )
 
 func main() {
+	l, err := logger.NewInstance()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	l.Errorf()
+	l.Error()
+	l.Debugf()
+	l.Debug()
+	l.Info()
+	l.Infof()
+	l.Warn()
+	l.Warnf()
 
 	// Grpc server
 	userGrpcHandler := grpcHandler.NewUserHandler()
