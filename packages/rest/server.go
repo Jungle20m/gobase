@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -9,20 +10,15 @@ import (
 const (
 	_defaultReadTimeout     = 10 * time.Second
 	_defaultWriteTimeout    = 10 * time.Second
-	_defaultAddr            = ":8001"
+	_defaultAddr            = ":8000"
 	_defaultShutdownTimeout = 5 * time.Second
 )
 
 type server struct {
 	server *http.Server
-	host   string
-	port   int
 }
 
-func NewServer(handler http.Handler, host string, port int) *server {
-	//handler := gin.New()
-	//handler.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, "ping") })
-
+func NewInstance(handler http.Handler, host string, port int) *server {
 	httpServer := &http.Server{
 		Addr:              fmt.Sprintf("%s:%d", host, port),
 		Handler:           handler,
@@ -41,19 +37,22 @@ func NewServer(handler http.Handler, host string, port int) *server {
 
 	return &server{
 		server: httpServer,
-		host:   host,
-		port:   port,
 	}
 }
 
 func (s *server) Serve() {
 	go func() {
-		s.server.ListenAndServe()
+		if err := s.server.ListenAndServe(); err != nil {
+			if err == http.ErrServerClosed {
+				log.Println("Rest server is closed")
+			} else {
+				log.Fatalf("Failed to run rest server: %s\n", err)
+			}
+		}
 	}()
-
-	fmt.Printf("Rest Server Listening In %v\n", s.server.Addr)
+	log.Printf("Rest server is listening in %v\n", s.server.Addr)
 }
 
 func (s *server) Terminal() {
-	fmt.Println("Rest Server Stopped")
+	s.server.Close()
 }
