@@ -1,12 +1,14 @@
 package main
 
 import (
-	grpcHandler "gobase/internal/user/handler/grpc"
-	"gobase/internal/user/handler/grpc/protoc"
-	restHandler "gobase/internal/user/handler/rest"
+	grpcPayment "gobase/internal/payment/handler/grpc"
+	"gobase/internal/payment/handler/grpc/protoc"
+	restPayment "gobase/internal/payment/handler/rest"
 	"gobase/logger"
+	mgorm "gobase/packages/gorm"
 	grpcServer "gobase/packages/grpc"
 	restServer "gobase/packages/rest"
+	mutils "gobase/utils"
 	"log"
 	"os"
 	"os/signal"
@@ -24,19 +26,22 @@ func main() {
 	}
 	l.Info("hello world")
 
-	//db, err := mgorm.NewInstance("")
+	db, err := mgorm.NewInstance("anhnv:123456@tcp(localhost:3308)/healthnet?charset=utf8mb4&parseTime=True&loc=Local")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	//connection := db.GetConnection()
+	utils := mutils.NewInstance(db.GetDB(), l)
 
 	// Grpc server
-	userGrpcHandler := grpcHandler.NewUserHandler()
+	grpcPaymentHandler := grpcPayment.NewHandler(utils)
 	grpcSV := grpcServer.NewInstance("", 9002)
-	protoc.RegisterUserServer(grpcSV.GetInstance(), userGrpcHandler)
+	protoc.RegisterUserServer(grpcSV.GetInstance(), grpcPaymentHandler)
 	grpcSV.Serve()
 
 	// Rest api server
-	userRestHandler := restHandler.NewUserHandler()
-	restSV := restServer.NewInstance(userRestHandler, "", 8002)
+	restPaymentHandler := restPayment.NewHandler(utils)
+	restSV := restServer.NewInstance(restPaymentHandler, "", 8002)
 	restSV.Serve()
 
 	// Graceful shutdown

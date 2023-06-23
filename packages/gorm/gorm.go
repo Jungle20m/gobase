@@ -77,6 +77,6 @@ func NewInstance(dsn string, opts ...Option) (*Database, error) {
 	}
 }
 
-func (db *Database) GetConnection() *gorm.DB {
+func (db *Database) GetDB() *gorm.DB {
 	return db.conn
 }
