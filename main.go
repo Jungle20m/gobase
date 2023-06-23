@@ -14,19 +14,23 @@ import (
 )
 
 func main() {
-	l, err := logger.NewInstance()
+	l, err := logger.NewInstance(
+		logger.WithFormatter(logger.TextFormatter),
+		//logger.WithFileOutput("log", "gobase.log"),
+		logger.WithLevel(logger.TraceLevel),
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	l.Errorf()
-	l.Error()
-	l.Debugf()
-	l.Debug()
-	l.Info()
-	l.Infof()
-	l.Warn()
-	l.Warnf()
+	l.Info("hello world")
+	l.Infof("hello %v %v", "world", "hi")
+	l.Debug("hello world")
+	l.Debugf("hello ", "world")
+	l.Warn("hello world")
+	l.Warnf("hello ", "world")
+	l.Error("hello world")
+	l.Errorf("hello ", "world")
 
 	// Grpc server
 	userGrpcHandler := grpcHandler.NewUserHandler()
