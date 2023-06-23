@@ -1,106 +1,176 @@
 package logger
 
-import "fmt"
+import (
+	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
+	"path/filepath"
+)
+
+type Formatter int
+
+const (
+	DefaultFormatter Formatter = iota
+	JsonFormatter
+	TextFormatter
+)
+
+type Output int
+
+const (
+	DefaultOutput Output = iota
+	StandardOutput
+	FileOutput
+)
+
+type Level int
+
+const (
+	DefaultLevel Level = iota
+	FatalLevel
+	ErrorLevel
+	WarnLevel
+	InfoLevel
+	DebugLevel
+	TraceLevel
+)
 
 type ILogger interface {
-	Info()
-	Infof()
-	Debug()
-	Debugf()
-	Warn()
-	Warnf()
-	Error()
-	Errorf()
+	Info(args ...interface{})
+	Infof(format string, args ...interface{})
+	Debug(args ...interface{})
+	Debugf(format string, args ...interface{})
+	Warn(args ...interface{})
+	Warnf(format string, args ...interface{})
+	Error(args ...interface{})
+	Errorf(format string, args ...interface{})
 }
 
 type logger struct {
-	//log *logrus.Logger
+	lrus     *logrus.Logger
+	format   Formatter
+	output   Output
+	dir      string
+	fileName string
+	level    Level
 }
 
-func NewInstance() (ILogger, error) {
-	//log = logrus.New()
-	//formatter := new(logrus.TextFormatter)
-	//formatter.TimestampFormat = "2006-01-02 15:04:05"
-	//formatter.FullTimestamp = true
-	//log.SetFormatter(formatter)
-	//
-	//etrackerweb.SetLogger(log.WithField("p", "WEB"))
-	//mysqlclient.SetLogger(log.WithField("p", "MYSQL"))
-	//
-	//switch conf.Log.Formatter {
-	//case 1:
-	//	// jsonFormatter
-	//	formatter := logrus.JSONFormatter{
-	//		TimestampFormat: "2006-01-02 15:04:05",
-	//	}
-	//	log.SetFormatter(&formatter)
-	//	break
-	//default:
-	//	formatter := new(logrus.TextFormatter)
-	//	formatter.TimestampFormat = "2006-01-02 15:04:05"
-	//	formatter.FullTimestamp = true
-	//	log.SetFormatter(formatter)
-	//}
-	//switch conf.Log.Output {
-	//case 1:
-	//	// log to file
-	//	log.SetOutput(&lumberjack.Logger{
-	//		Filename:   filepath.Join(conf.System.LogDir, "etracker.log"),
-	//		MaxSize:    500, // megabytes
-	//		MaxBackups: 3,
-	//		MaxAge:     28,    //days
-	//		Compress:   false, // disabled by default
-	//	})
-	//default:
-	//	// log to the terminal
-	//}
-	//var level = logrus.PanicLevel
-	//switch conf.Log.Level {
-	//case 1:
-	//	level = logrus.FatalLevel
-	//	break
-	//case 2:
-	//	level = logrus.ErrorLevel
-	//	break
-	//case 3:
-	//	level = logrus.WarnLevel
-	//	break
-	//case 4:
-	//	level = logrus.InfoLevel
-	//	break
-	//case 5:
-	//	level = logrus.DebugLevel
-	//	break
-	//case 6:
-	//	level = logrus.TraceLevel
-	//	break
-	//}
-	//log.SetLevel(level)
+type Option func(*logger) error
 
-	return &logger{}, nil
+func WithFormatter(formatter Formatter) Option {
+	return func(l *logger) error {
+		l.format = formatter
+		return nil
+	}
 }
 
-func (l *logger) Info() {
-	fmt.Println("info")
+func WithFileOutput(directory string, fileName string) Option {
+	return func(l *logger) error {
+		l.output = FileOutput
+		l.dir = directory
+		l.fileName = fileName
+		return nil
+	}
 }
-func (l *logger) Infof() {
-	fmt.Println("infof")
+
+func WithLevel(level Level) Option {
+	return func(l *logger) error {
+		l.level = level
+		return nil
+	}
 }
-func (l *logger) Debug() {
-	fmt.Println("debug")
+
+func NewInstance(opts ...Option) (ILogger, error) {
+	// Create default instance
+	instance := &logger{
+		lrus:   logrus.New(),
+		format: DefaultFormatter,
+		output: DefaultOutput,
+		level:  DefaultLevel,
+	}
+
+	for _, opt := range opts {
+		err := opt(instance)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	switch instance.format {
+	case JsonFormatter:
+		formatter := logrus.JSONFormatter{
+			TimestampFormat: "2006-01-02 15:04:05",
+		}
+		instance.lrus.SetFormatter(&formatter)
+		break
+	default:
+		formatter := new(logrus.TextFormatter)
+		formatter.TimestampFormat = "2006-01-02 15:04:05"
+		formatter.FullTimestamp = true
+		instance.lrus.SetFormatter(formatter)
+	}
+
+	switch instance.output {
+	case FileOutput:
+		instance.lrus.SetOutput(&lumberjack.Logger{
+			Filename:   filepath.Join(instance.dir, instance.fileName),
+			MaxSize:    500, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28,    //days
+			Compress:   false, // disabled by default
+		})
+	default:
+		// log to the terminal
+	}
+
+	instance.lrus.SetLevel(logrus.InfoLevel)
+
+	switch instance.level {
+	case FatalLevel:
+		instance.lrus.SetLevel(logrus.FatalLevel)
+		break
+	case ErrorLevel:
+		instance.lrus.SetLevel(logrus.ErrorLevel)
+		break
+	case WarnLevel:
+		instance.lrus.SetLevel(logrus.WarnLevel)
+		break
+	case InfoLevel:
+		instance.lrus.SetLevel(logrus.InfoLevel)
+		break
+	case DebugLevel:
+		instance.lrus.SetLevel(logrus.DebugLevel)
+		break
+	case TraceLevel:
+		instance.lrus.SetLevel(logrus.TraceLevel)
+		break
+	default:
+		instance.lrus.SetLevel(logrus.InfoLevel)
+	}
+
+	return instance, nil
 }
-func (l *logger) Debugf() {
-	fmt.Println("debugf")
+
+func (l *logger) Info(args ...interface{}) {
+	l.lrus.Info(args)
 }
-func (l *logger) Warn() {
-	fmt.Println("warn")
+func (l *logger) Infof(format string, args ...interface{}) {
+	l.lrus.Infof(format, args)
 }
-func (l *logger) Warnf() {
-	fmt.Println("warnf")
+func (l *logger) Debug(args ...interface{}) {
+	l.lrus.Debug(args)
 }
-func (l *logger) Error() {
-	fmt.Println("error")
+func (l *logger) Debugf(format string, args ...interface{}) {
+	l.lrus.Debugf(format, args)
 }
-func (l *logger) Errorf() {
-	fmt.Println("errorf")
+func (l *logger) Warn(args ...interface{}) {
+	l.lrus.Warn(args)
+}
+func (l *logger) Warnf(format string, args ...interface{}) {
+	l.lrus.Warnf(format, args)
+}
+func (l *logger) Error(args ...interface{}) {
+	l.lrus.Error(args)
+}
+func (l *logger) Errorf(format string, args ...interface{}) {
+	l.lrus.Errorf(format, args)
 }
