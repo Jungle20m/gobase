@@ -22,8 +22,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	l.Info("hello world")
+
+	//db, err := mgorm.NewInstance("")
+
+	//connection := db.GetConnection()
 
 	// Grpc server
 	userGrpcHandler := grpcHandler.NewUserHandler()
