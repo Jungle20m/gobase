@@ -2,7 +2,6 @@ package main
 
 import (
 	grpcPayment "gobase/internal/payment/handler/grpc"
-	"gobase/internal/payment/handler/grpc/protoc"
 	restPayment "gobase/internal/payment/handler/rest"
 	"gobase/logger"
 	mgorm "gobase/packages/gorm"
@@ -34,9 +33,9 @@ func main() {
 	utils := mutils.NewInstance(db.GetDB(), l)
 
 	// Grpc server
-	grpcPaymentHandler := grpcPayment.NewHandler(utils)
 	grpcSV := grpcServer.NewInstance("", 9002)
-	protoc.RegisterUserServer(grpcSV.GetInstance(), grpcPaymentHandler)
+	grpcPaymentHandler := grpcPayment.NewHandler(utils)
+	grpcPaymentHandler.Attach(grpcSV.GetInstance())
 	grpcSV.Serve()
 
 	// Rest api server

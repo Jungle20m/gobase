@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package server;
+
+option go_package = "iam/internal/rpc/protoc";
+
+
+message GetTokenRequest {
+  int64 id = 1;
+}
+
+message GetTokenResponse {
+  string message = 1;
+}
+
+
+
+
+service Token {
+  rpc GetTokenByID (GetTokenRequest) returns (GetTokenResponse) {}
+}

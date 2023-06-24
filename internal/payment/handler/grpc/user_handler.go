@@ -7,12 +7,12 @@ import (
 	"gobase/internal/payment/usecase"
 )
 
-func (h *handler) Ping(ctx context.Context, in *protoc.Request) (*protoc.Response, error) {
+func (h *handler) GetUserByID(ctx context.Context, in *protoc.GetUserRequest) (*protoc.GetUserResponse, error) {
 
 	repo := repository.NewInstance(repository.WithGorm(h.utils.GetDB()))
 	uc := usecase.NewUserUC(h.utils, repo)
 
-	uc.GetUserByID(ctx, 1)
+	uc.GetUserByID(ctx, int(in.GetId()))
 
-	return &protoc.Response{Message: "pong"}, nil
+	return &protoc.GetUserResponse{Message: "success"}, nil
 }

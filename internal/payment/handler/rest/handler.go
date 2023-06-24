@@ -15,6 +15,11 @@ func NewHandler(utils mutils.IUtils) *gin.Engine {
 		user.GET("/", GetUser(utils))
 	}
 
+	token := handler.Group("/token")
+	{
+		token.GET("/", GetTokenByID(utils))
+	}
+
 	handler.GET("/ping", func(c *gin.Context) { c.JSON(http.StatusOK, "pong") })
 
 	return handler
