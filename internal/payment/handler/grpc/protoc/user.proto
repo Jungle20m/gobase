@@ -5,11 +5,11 @@ package server;
 option go_package = "iam/internal/rpc/protoc";
 
 
-message Request {
-  string message = 1;
+message GetUserRequest {
+  int64 id = 1;
 }
 
-message Response {
+message GetUserResponse {
   string message = 1;
 }
 
@@ -17,5 +17,5 @@ message Response {
 
 
 service User {
-  rpc Ping (Request) returns (Response) {}
+  rpc GetUserByID (GetUserRequest) returns (GetUserResponse) {}
 }
