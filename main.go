@@ -25,7 +25,7 @@ func main() {
 	}
 	l.Info("hello world")
 
-	db, err := mgorm.NewInstance("anhnv:123456@tcp(localhost:3308)/healthnet?charset=utf8mb4&parseTime=True&loc=Local")
+	db, err := mgorm.NewInstance("anhnv:123456@tcp(mysql:3306)/healthnet?charset=utf8mb4&parseTime=True&loc=Local")
 	if err != nil {
 		log.Fatal(err)
 	}
