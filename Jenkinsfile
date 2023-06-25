@@ -13,7 +13,7 @@ pipeline{
         }
         stage('Build') {
             steps {
-                withDockerRegistry(credentialsId: 'gobase', url: 'https://index.docker.io/v1/') {
+                withDockerRegistry(credentialsId: 'gobase', url: 'https://hub.docker.com/') {
                     sh 'docker build -t vietanhd14cn7/gobase:latest .'
                     sh 'docker push vietanhd14cn7/gobase:latest .'
                 }
