@@ -1,22 +1,24 @@
 pipeline{
     agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('gobase')
+    }
+
     stages {
         stage('Clone') {
             steps {
                 git 'https://github.com/Jungle20m/gobase.git'
             }
         }
-        stage('Test') {
+        stage('Login') {
             steps {
-                echo 'Test'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
         stage('Build') {
             steps {
-                withDockerRegistry(credentialsId: 'gobase', url: '') {
-                    sh 'docker build -t vietanhd14cn7/gobase:latest .'
-                    sh 'docker push vietanhd14cn7/gobase:latest .'
-                }
+                echo 'Build'
             }
         }
         stage('Deploy') {
