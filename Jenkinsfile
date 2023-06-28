@@ -22,7 +22,7 @@ pipeline{
 
         stage('Push') {
             steps {
-                echo 'docker push vietanhd14cn7/gobase:latest'
+                echo 'docker push vietanhd14cn7/gobase:latest .'
             }
         }
     }
