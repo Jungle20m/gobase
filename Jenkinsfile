@@ -1,5 +1,8 @@
 pipeline{
     agent any
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('github')
+    }
     stages {
         stage('Clone') {
             steps {
@@ -8,7 +11,7 @@ pipeline{
         }
         stage('Login') {
             steps {
-                echo 'Logout'
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
             }
         }
         stage('Build') {
@@ -20,6 +23,11 @@ pipeline{
             steps {
                 echo 'Deploy'
             }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
