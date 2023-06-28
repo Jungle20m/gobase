@@ -1,10 +1,5 @@
 pipeline{
     agent any
-
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('gobase')
-    }
-
     stages {
         stage('Clone') {
             steps {
