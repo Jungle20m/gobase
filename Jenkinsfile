@@ -13,7 +13,7 @@ pipeline{
         }
         stage('Login') {
             steps {
-                echo 'Login'
+                echo 'Logout'
             }
         }
         stage('Build') {
